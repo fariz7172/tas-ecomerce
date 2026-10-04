@@ -385,7 +385,7 @@
             </div>
         </div>
         @else
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             @foreach($products as $product)
             @php
                 $mainVariant = $product->variants->first();
@@ -396,7 +396,7 @@
                 $totalStock = $product->variants->sum('stock');
                 $isSoldOut = $totalStock <= 0;
             @endphp
-            <div class="distinct-card rounded-[2.5rem] p-6 flex flex-col justify-between shadow-card-pop group relative overflow-hidden {{ $isSoldOut ? 'bg-[#FAF8F9]' : '' }}">
+            <div class="distinct-card rounded-[2.5rem] p-6 flex flex-col justify-between h-full shadow-card-pop group relative overflow-hidden {{ $isSoldOut ? 'bg-[#FAF8F9]' : '' }}">
                 
                 <!-- Badge Official Store & Promo -->
                 <div class="flex items-center justify-between mb-4 relative z-10">
@@ -414,9 +414,9 @@
                     @endif
                 </div>
 
-                <div>
+                <div class="flex-1 flex flex-col">
                     <!-- Interactive Card Media Slider (Photo Carousel & 3D Interactive WebGL) -->
-                    <div class="relative w-full h-72 rounded-2xl overflow-hidden bg-[#FAF7F8] mb-6 border-2 border-rosepet-soft/60 group/slider" id="slider-card-{{ $product->id }}">
+                    <div class="relative w-full h-72 rounded-2xl overflow-hidden bg-[#FAF7F8] mb-6 border-2 border-rosepet-soft/60 group/slider flex-shrink-0" id="slider-card-{{ $product->id }}">
                         
                         @php
                             $has3D = !empty($product->model_3d_path);
@@ -472,91 +472,97 @@
                     </div>
 
                     <!-- Title & Comprehensive Description (Ala Tokopedia) -->
-                    <div class="space-y-3">
-                        <a href="{{ route('product.detail', $product->slug) }}">
-                            <h3 class="font-serif text-xl font-bold text-rosepet-dark hover:text-rosepet-fresh transition-colors leading-snug">
-                                {{ $product->name }}
-                            </h3>
-                        </a>
+                    <div class="space-y-3 flex-1 flex flex-col justify-between">
+                        <div>
+                            <a href="{{ route('product.detail', $product->slug) }}">
+                                <h3 class="font-serif text-xl font-bold text-rosepet-dark hover:text-rosepet-fresh transition-colors leading-snug line-clamp-2 min-h-[3.25rem]">
+                                    {{ $product->name }}
+                                </h3>
+                            </a>
 
-                        <!-- Price Section (Tokopedia Format) -->
-                        <div class="pt-1">
-                            <div class="font-serif font-black text-2xl text-rosepet-dark">
-                                Rp {{ number_format($promoPrice, 0, ',', '.') }}
+                            <!-- Price Section (Tokopedia Format) -->
+                            <div class="pt-1">
+                                <div class="font-serif font-black text-2xl text-rosepet-dark">
+                                    Rp {{ number_format($promoPrice, 0, ',', '.') }}
+                                </div>
+                                @if($discountPercent > 0)
+                                <div class="flex items-center gap-2 mt-0.5 text-xs text-rosepet-muted">
+                                    <span class="line-through">Rp {{ number_format($price, 0, ',', '.') }}</span>
+                                    <span class="text-rosepet-fresh font-bold text-[11px] bg-rose-50 px-1.5 py-0.5 rounded">Diskon {{ $discountPercent }}%</span>
+                                </div>
+                                @else
+                                <div class="h-5"></div>
+                                @endif
                             </div>
-                            @if($discountPercent > 0)
-                            <div class="flex items-center gap-2 mt-0.5 text-xs text-rosepet-muted">
-                                <span class="line-through">Rp {{ number_format($price, 0, ',', '.') }}</span>
-                                <span class="text-rosepet-fresh font-bold text-[11px] bg-rose-50 px-1.5 py-0.5 rounded">Diskon {{ $discountPercent }}%</span>
+
+                            <!-- Full Deskripsi Produk & Material (Detail Padat & Jelas) -->
+                            <div class="text-xs text-rosepet-muted leading-relaxed line-clamp-3 mt-2 min-h-[3.75rem]">
+                                {!! $product->description !!}
                             </div>
-                            @endif
                         </div>
 
-                        <!-- Full Deskripsi Produk & Material (Detail Padat & Jelas) -->
-                        <div class="text-xs text-rosepet-muted leading-relaxed line-clamp-3">
-                            {!! $product->description !!}
-                        </div>
+                        <div class="space-y-3 pt-3">
+                            <!-- Box Spesifikasi Lengkap Produk (Tokopedia Technical Specs Table) -->
+                            <div class="bg-[#FFF5F7] rounded-2xl p-4 border border-rosepet-border space-y-2 text-[11px] relative overflow-hidden">
+                                @if($isSoldOut)
+                                <!-- WATERMARK STAMP SOLD OUT (DI DALAM BOX SPESIFIKASI PRODUK) -->
+                                <div class="absolute inset-0 z-20 pointer-events-none flex items-center justify-center bg-white/40 backdrop-blur-[1.5px]">
+                                    <div class="w-[120%] py-2.5 bg-gradient-to-r from-rose-700/95 via-red-600/95 to-rose-700/95 text-white font-serif font-black text-sm sm:text-base tracking-[0.25em] uppercase text-center transform -rotate-6 shadow-xl border-y-2 border-white flex items-center justify-center gap-2">
+                                        <span class="text-[10px] opacity-80">✦</span>
+                                        <span>BARANG SOLD OUT</span>
+                                        <span class="text-[10px] opacity-80">✦</span>
+                                    </div>
+                                </div>
+                                @endif
 
-                        <!-- Box Spesifikasi Lengkap Produk (Tokopedia Technical Specs Table) -->
-                        <div class="bg-[#FFF5F7] rounded-2xl p-4 border border-rosepet-border space-y-2 text-[11px] relative overflow-hidden">
-                            @if($isSoldOut)
-                            <!-- WATERMARK STAMP SOLD OUT (DI DALAM BOX SPESIFIKASI PRODUK) -->
-                            <div class="absolute inset-0 z-20 pointer-events-none flex items-center justify-center bg-white/40 backdrop-blur-[1.5px]">
-                                <div class="w-[120%] py-2.5 bg-gradient-to-r from-rose-700/95 via-red-600/95 to-rose-700/95 text-white font-serif font-black text-sm sm:text-base tracking-[0.25em] uppercase text-center transform -rotate-6 shadow-xl border-y-2 border-white flex items-center justify-center gap-2">
-                                    <span class="text-[10px] opacity-80">✦</span>
-                                    <span>BARANG SOLD OUT</span>
-                                    <span class="text-[10px] opacity-80">✦</span>
+                                <div class="font-bold text-rosepet-dark text-[10px] uppercase tracking-wider pb-1 border-b border-rosepet-soft flex items-center justify-between">
+                                    <span>Spesifikasi Produk</span>
+                                    <span class="text-rosepet-fresh">Tas Murni</span>
                                 </div>
+                                <div class="grid grid-cols-2 gap-2 text-rosepet-dark">
+                                    <div>
+                                        <span class="text-rosepet-muted block text-[10px]">Bahan / Material:</span>
+                                        <strong class="font-semibold truncate block" title="{{ $product->material }}">{{ $product->material }}</strong>
+                                    </div>
+                                    <div>
+                                        <span class="text-rosepet-muted block text-[10px]">Dimensi (P x L x T):</span>
+                                        <strong class="font-semibold truncate block" title="{{ $product->dimensions_cm }}">{{ $product->dimensions_cm }}</strong>
+                                    </div>
+                                    <div>
+                                        <span class="text-rosepet-muted block text-[10px]">Berat Kosong:</span>
+                                        <strong class="font-semibold">{{ $product->weight_grams }} gram</strong>
+                                    </div>
+                                    <div>
+                                        <span class="text-rosepet-muted block text-[10px]">Tipe Pengunci:</span>
+                                        <strong class="font-semibold truncate block" title="{{ $product->closure_type }}">{{ $product->closure_type }}</strong>
+                                    </div>
+                                </div>
+                                @if($product->strap_length && $product->strap_length !== '-')
+                                <div class="pt-1 border-t border-rosepet-soft text-[10px]">
+                                    <span class="text-rosepet-muted">Tali Bahu: </span>
+                                    <strong class="text-rosepet-dark truncate inline-block max-w-[200px] align-bottom">{{ $product->strap_length }}</strong>
+                                </div>
+                                @endif
                             </div>
-                            @endif
 
-                            <div class="font-bold text-rosepet-dark text-[10px] uppercase tracking-wider pb-1 border-b border-rosepet-soft flex items-center justify-between">
-                                <span>Spesifikasi Produk</span>
-                                <span class="text-rosepet-fresh">Tas Murni</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-rosepet-dark">
-                                <div>
-                                    <span class="text-rosepet-muted block text-[10px]">Bahan / Material:</span>
-                                    <strong class="font-semibold">{{ $product->material }}</strong>
+                            <!-- Variant Color Badges & Stock -->
+                            <div class="pt-1 flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-bold text-rosepet-muted mr-1">Varian:</span>
+                                    @foreach($product->variants as $var)
+                                    <span class="w-4 h-4 rounded-full border-2 border-white shadow-sm flex-shrink-0" style="background-color: {{ $var->color_hex }}" title="{{ $var->color_name }}"></span>
+                                    @endforeach
                                 </div>
-                                <div>
-                                    <span class="text-rosepet-muted block text-[10px]">Dimensi (P x L x T):</span>
-                                    <strong class="font-semibold">{{ $product->dimensions_cm }}</strong>
-                                </div>
-                                <div>
-                                    <span class="text-rosepet-muted block text-[10px]">Berat Kosong:</span>
-                                    <strong class="font-semibold">{{ $product->weight_grams }} gram</strong>
-                                </div>
-                                <div>
-                                    <span class="text-rosepet-muted block text-[10px]">Tipe Pengunci:</span>
-                                    <strong class="font-semibold">{{ $product->closure_type }}</strong>
-                                </div>
+                                @if($isSoldOut)
+                                <span class="text-[11px] font-bold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-md border border-rose-200">
+                                    ❌ Stok Habis
+                                </span>
+                                @else
+                                <span class="text-[11px] font-bold text-emerald-700">
+                                    Stok: {{ $totalStock }} pcs
+                                </span>
+                                @endif
                             </div>
-                            @if($product->strap_length && $product->strap_length !== '-')
-                            <div class="pt-1 border-t border-rosepet-soft text-[10px]">
-                                <span class="text-rosepet-muted">Tali Bahu: </span>
-                                <strong class="text-rosepet-dark">{{ $product->strap_length }}</strong>
-                            </div>
-                            @endif
-                        </div>
-
-                        <!-- Variant Color Badges & Stock -->
-                        <div class="pt-1 flex items-center justify-between text-xs">
-                            <div class="flex items-center gap-1.5">
-                                <span class="text-[10px] font-bold text-rosepet-muted mr-1">Varian:</span>
-                                @foreach($product->variants as $var)
-                                <span class="w-4 h-4 rounded-full border-2 border-white shadow-sm" style="background-color: {{ $var->color_hex }}" title="{{ $var->color_name }}"></span>
-                                @endforeach
-                            </div>
-                            @if($isSoldOut)
-                            <span class="text-[11px] font-bold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-md border border-rose-200">
-                                ❌ Stok Habis
-                            </span>
-                            @else
-                            <span class="text-[11px] font-bold text-emerald-700">
-                                Stok: {{ $totalStock }} pcs
-                            </span>
-                            @endif
                         </div>
                     </div>
                 </div>
