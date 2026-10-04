@@ -418,15 +418,19 @@
                     <!-- Interactive Card Media Slider (Photo Carousel & 3D Interactive WebGL) -->
                     <div class="relative w-full h-72 rounded-2xl overflow-hidden bg-[#FAF7F8] mb-6 border-2 border-rosepet-soft/60 group/slider" id="slider-card-{{ $product->id }}">
                         
+                        @php
+                            $has3D = !empty($product->model_3d_path);
+                        @endphp
+
                         <!-- Slide 1: Photo View -->
-                        <div id="slide-photo-{{ $product->id }}" class="w-full h-full flex items-center justify-center p-2 relative">
+                        <div id="slide-photo-{{ $product->id }}" class="{{ $has3D ? 'hidden' : '' }} w-full h-full flex items-center justify-center p-2 relative">
                             <a href="{{ route('product.detail', $product->slug) }}" class="w-full h-full flex items-center justify-center">
                                 <img id="slide-img-{{ $product->id }}" src="{{ $displayImage }}" 
                                      alt="{{ $product->name }} - {{ $product->material }}" 
                                      class="w-full h-full object-contain group-hover/slider:scale-105 transition-transform duration-500">
                             </a>
 
-                            <!-- Dots Indicator jika ada multi foto atau 3D -->
+                            <!-- Dots Indicator jika ada multi foto -->
                             @if($product->images->count() > 1)
                             <div class="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/20 backdrop-blur-sm z-10">
                                 @foreach($product->images as $imgIdx => $img)
@@ -436,17 +440,17 @@
                             @endif
                         </div>
 
-                        <!-- Slide 2: 3D Model View (Jika tersedia) -->
-                        @if($product->model_3d_path)
-                        <div id="slide-3d-{{ $product->id }}" class="hidden w-full h-full relative bg-gradient-to-b from-[#FFF5F7] to-[#FDF0F3]">
+                        <!-- Slide 2: 3D Model View (Default Aktif jika tersedia model 3D) -->
+                        @if($has3D)
+                        <div id="slide-3d-{{ $product->id }}" class="w-full h-full relative bg-gradient-to-b from-[#FFF5F7] to-[#FDF0F3]" data-glb-url="{{ asset($product->model_3d_path) }}">
                             <canvas id="canvas-card-3d-{{ $product->id }}" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
                             
-                            <div class="absolute top-2 left-2 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[9px] font-bold text-rosepet-dark border border-rosepet-soft pointer-events-none shadow-sm flex items-center gap-1">
+                            <div class="absolute top-2 left-2 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[9px] font-bold text-rosepet-dark border border-rosepet-soft pointer-events-none shadow-sm flex items-center gap-1 z-10">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span>Putar 360°</span>
+                                <span>Model 3D Interaktif</span>
                             </div>
 
-                            <div id="loader-card-3d-{{ $product->id }}" class="absolute inset-0 bg-[#FFF5F7]/80 backdrop-blur-sm flex flex-col items-center justify-center gap-1.5">
+                            <div id="loader-card-3d-{{ $product->id }}" class="absolute inset-0 bg-[#FFF5F7]/80 backdrop-blur-sm flex flex-col items-center justify-center gap-1.5 z-10">
                                 <svg class="animate-spin h-5 w-5 text-rosepet-fresh" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
                                 <span class="text-[10px] font-bold text-rosepet-dark">Memuat 3D...</span>
                             </div>
@@ -455,14 +459,14 @@
 
                         <!-- Slider Toggle Controls (Top Right Overlay) -->
                         <div class="absolute top-3 right-3 flex items-center gap-1 z-20">
-                            <button type="button" onclick="switchCardSlide({{ $product->id }}, 'photo')" id="btn-card-photo-{{ $product->id }}" class="px-2.5 py-1 rounded-xl bg-white/95 text-rosepet-dark text-[10px] font-bold shadow-sm border border-rosepet-soft hover:bg-rosepet-fresh hover:text-white transition-all flex items-center gap-1" title="Tampilkan Foto">
-                                <span>📷 Foto</span>
-                            </button>
-                            @if($product->model_3d_path)
-                            <button type="button" onclick="switchCardSlide({{ $product->id }}, '3d', '{{ asset($product->model_3d_path) }}')" id="btn-card-3d-{{ $product->id }}" class="px-2.5 py-1 rounded-xl bg-white/80 text-rosepet-deep text-[10px] font-bold shadow-sm border border-rosepet-soft hover:bg-rosepet-fresh hover:text-white transition-all flex items-center gap-1" title="Tampilkan Model 3D">
+                            @if($has3D)
+                            <button type="button" onclick="switchCardSlide({{ $product->id }}, '3d', '{{ asset($product->model_3d_path) }}')" id="btn-card-3d-{{ $product->id }}" class="px-2.5 py-1 rounded-xl bg-gradient-to-r from-rosepet-fresh to-rosepet-vibrant text-white text-[10px] font-bold shadow-sm border border-transparent transition-all flex items-center gap-1" title="Tampilkan Model 3D">
                                 <span>🎮 3D</span>
                             </button>
                             @endif
+                            <button type="button" onclick="switchCardSlide({{ $product->id }}, 'photo')" id="btn-card-photo-{{ $product->id }}" class="px-2.5 py-1 rounded-xl {{ $has3D ? 'bg-white/80 text-rosepet-deep' : 'bg-white/95 text-rosepet-dark' }} text-[10px] font-bold shadow-sm border border-rosepet-soft hover:bg-rosepet-fresh hover:text-white transition-all flex items-center gap-1" title="Tampilkan Foto">
+                                <span>📷 Foto</span>
+                            </button>
                         </div>
 
                     </div>
@@ -1026,18 +1030,30 @@
 
                 pivotGroup.add(model);
                 if (loaderEl) loaderEl.style.display = 'none';
+
+                card3dInstances[productId] = { scene, camera, renderer, controls, pivotGroup };
+
+                function animateCard() {
+                    requestAnimationFrame(animateCard);
+                    controls.update();
+                    pivotGroup.rotation.y += 0.003;
+                    renderer.render(scene, camera);
+                }
+                animateCard();
             });
-
-            card3dInstances[productId] = { scene, camera, renderer, controls, pivotGroup };
-
-            function animateCard() {
-                requestAnimationFrame(animateCard);
-                controls.update();
-                pivotGroup.rotation.y += 0.003;
-                renderer.render(scene, camera);
-            }
-            animateCard();
         }
+
+        // Auto-Inisialisasi Model 3D pada Card Katalog yang Memiliki 3D Path
+        document.addEventListener('DOMContentLoaded', () => {
+            const card3dContainers = document.querySelectorAll('[id^="slide-3d-"][data-glb-url]');
+            card3dContainers.forEach(container => {
+                const productId = container.id.replace('slide-3d-', '');
+                const glbUrl = container.getAttribute('data-glb-url');
+                if (productId && glbUrl && !card3dInstances[productId]) {
+                    initCard3d(productId, glbUrl);
+                }
+            });
+        });
     </script>
 </body>
 </html>
