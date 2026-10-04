@@ -10,15 +10,35 @@
 
     <!-- Open Graph Meta Tags (Untuk Preview Kartu Facebook, WhatsApp & Twitter) -->
     @php
-        $ogImg = $product->images->first()?->image_path ? asset($product->images->first()->image_path) : asset('assets/logo.png');
-        $minPrice = $product->variants->min('promo_price') ?: $product->variants->min('price');
+        $primaryImg = $product->images->first();
+        $ogImg = $primaryImg?->image_path ? asset($primaryImg->image_path) : asset('assets/logo.png');
+        $minPromoPrice = $product->variants->min('promo_price');
+        $minNormalPrice = $product->variants->min('price');
+        $activePrice = $minPromoPrice ?: $minNormalPrice;
+        $brandName = $product->brand?->name ?? 'Mikael On Shop';
+        
+        $colorNames = $product->variants->pluck('color_name')->unique()->implode(', ');
+        $totalStock = $product->variants->sum('stock');
+        
+        $priceText = $minPromoPrice 
+            ? 'Promo Rp ' . number_format($minPromoPrice, 0, ',', '.') . ' (Normal Rp ' . number_format($minNormalPrice, 0, ',', '.') . ')'
+            : 'Rp ' . number_format($activePrice ?? 0, 0, ',', '.');
+
+        $ogDescription = "Brand: {$brandName} | {$priceText} | Warna: {$colorNames} | Stok: {$totalStock} pcs | Bahan: {$product->material} | Dimensi: {$product->dimensions_cm}. Garansi 100% Original & COD Se-Indonesia.";
     @endphp
     <meta property="og:type" content="product">
-    <meta property="og:title" content="{{ $product->name }} - Mikael On Shop">
-    <meta property="og:description" content="{{ $product->material }} • {{ $product->dimensions_cm }} • Mulai Rp {{ number_format($minPrice ?? 0, 0, ',', '.') }}. 100% Original Leather & COD Se-Indonesia.">
+    <meta property="og:title" content="{{ $brandName }} - {{ $product->name }} (Rp {{ number_format($activePrice ?? 0, 0, ',', '.') }})">
+    <meta property="og:description" content="{{ $ogDescription }}">
     <meta property="og:image" content="{{ $ogImg }}">
+    <meta property="og:image:secure_url" content="{{ $ogImg }}">
+    <meta property="og:image:alt" content="{{ $product->name }} {{ $brandName }}">
     <meta property="og:url" content="{{ route('product.detail', $product->slug) }}">
-    <meta property="og:site_name" content="Mikael On Shop">
+    <meta property="og:site_name" content="Mikael On Shop Luxury Store">
+    <meta property="product:brand" content="{{ $brandName }}">
+    <meta property="product:availability" content="{{ $totalStock > 0 ? 'in stock' : 'out of stock' }}">
+    <meta property="product:condition" content="new">
+    <meta property="product:price:amount" content="{{ $activePrice }}">
+    <meta property="product:price:currency" content="IDR">
 
     <!-- Google Fonts & Tailwind CDN -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
