@@ -137,10 +137,21 @@
             </a>
 
             <!-- Search Bar (E-Commerce Style Tokopedia) -->
-            <div class="hidden md:flex flex-1 max-w-xl relative">
-                <input type="text" placeholder="Cari tas pesta, tote bag kulit, handbag, shoulder bag..." class="w-full bg-[#FFF5F7] rounded-2xl pl-11 pr-4 py-2.5 text-xs text-rosepet-dark border-2 border-rosepet-soft focus:border-rosepet-fresh focus:bg-white outline-none transition-all placeholder:text-rosepet-muted font-medium">
-                <svg class="w-4 h-4 text-rosepet-muted absolute left-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </div>
+            <form action="{{ route('home') }}#katalog" method="GET" class="hidden md:flex flex-1 max-w-xl relative">
+                @if(request('category'))
+                <input type="hidden" name="category" value="{{ request('category') }}">
+                @endif
+                @if(request('brand'))
+                <input type="hidden" name="brand" value="{{ request('brand') }}">
+                @endif
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari tas pesta, tote bag kulit, handbag, shoulder bag..." class="w-full bg-[#FFF5F7] rounded-2xl pl-11 pr-10 py-2.5 text-xs text-rosepet-dark border-2 border-rosepet-soft focus:border-rosepet-fresh focus:bg-white outline-none transition-all placeholder:text-rosepet-muted font-medium">
+                <button type="submit" class="absolute left-4 top-3 text-rosepet-muted hover:text-rosepet-fresh transition-colors" title="Cari">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </button>
+                @if(request('q'))
+                <a href="{{ route('home', request()->except('q')) }}#katalog" class="absolute right-3 top-2.5 text-xs text-gray-400 hover:text-rose-600 font-bold p-1" title="Hapus Pencarian">✕</a>
+                @endif
+            </form>
 
             <!-- Quick Navigation, Wishlist & Auth -->
             <div class="flex items-center gap-3 flex-shrink-0">
@@ -343,6 +354,13 @@
             <div>
                 <span class="text-xs font-black uppercase tracking-widest text-rosepet-fresh">Official Catalog</span>
                 <h2 class="font-serif text-3xl sm:text-5xl font-black text-rosepet-dark mt-1">Daftar Produk Tas Pilihan</h2>
+                @if(request('q'))
+                <div class="mt-2 flex items-center gap-2 text-xs">
+                    <span class="text-rosepet-muted">Hasil pencarian untuk:</span>
+                    <span class="px-2.5 py-0.5 rounded-lg bg-rosepet-soft text-rosepet-deep font-bold font-mono">"{{ request('q') }}"</span>
+                    <a href="{{ route('home', request()->except('q')) }}#katalog" class="text-rose-600 hover:underline font-bold text-[11px] ml-1">✕ Reset Pencarian</a>
+                </div>
+                @endif
             </div>
             <div class="flex items-center gap-3">
                 <span class="text-xs text-rosepet-muted font-bold">Total: <strong class="text-rosepet-dark">{{ $products->count() }} Koleksi</strong></span>
@@ -352,6 +370,21 @@
         </div>
 
         <!-- PRODUCT GRID (DISTINCT CARDS DENGAN BORDER TEBAL & SHADOW KONTRAS) -->
+        @if($products->isEmpty())
+        <div class="py-16 text-center space-y-4 bg-white/70 backdrop-blur-sm rounded-[2.5rem] border-2 border-dashed border-rosepet-border p-12">
+            <span class="text-5xl block">🔍</span>
+            <h3 class="font-serif text-2xl font-bold text-rosepet-dark">Tas yang Anda cari belum ditemukan</h3>
+            <p class="text-xs text-rosepet-muted max-w-md mx-auto">
+                Tidak ada koleksi tas yang cocok dengan kata kunci <strong class="text-rosepet-dark">"{{ request('q') }}"</strong>. Coba periksa ejaan atau telusuri kategori tas lainnya.
+            </p>
+            <div class="pt-2">
+                <a href="{{ route('home') }}#katalog" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-rosepet-fresh to-rosepet-vibrant text-white font-bold text-xs shadow-md hover:shadow-lg transition-all">
+                    <span>Lihat Semua Koleksi Tas</span>
+                    <span>→</span>
+                </a>
+            </div>
+        </div>
+        @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($products as $product)
             @php
@@ -550,6 +583,7 @@
             </div>
             @endforeach
         </div>
+        @endif
 
     </main>
 

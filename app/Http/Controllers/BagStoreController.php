@@ -32,6 +32,22 @@ class BagStoreController extends Controller
 
         $query = Product::with(['category', 'brand', 'variants', 'images'])->where('is_active', true);
 
+        // Pencarian Kata Kunci (Nama, Deskripsi, Brand, Material)
+        if ($request->filled('q')) {
+            $keyword = trim($request->q);
+            $query->where(function($q) use ($keyword) {
+                $q->where('name', 'like', "%{$keyword}%")
+                  ->orWhere('description', 'like', "%{$keyword}%")
+                  ->orWhere('material', 'like', "%{$keyword}%")
+                  ->orWhereHas('brand', function($b) use ($keyword) {
+                      $b->where('name', 'like', "%{$keyword}%");
+                  })
+                  ->orWhereHas('category', function($c) use ($keyword) {
+                      $c->where('name', 'like', "%{$keyword}%");
+                  });
+            });
+        }
+
         // Filter Kategori jika ada
         if ($request->filled('category')) {
             $query->whereHas('category', function($q) use ($request) {
