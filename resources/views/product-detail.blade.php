@@ -421,9 +421,30 @@
             <!-- Lightbox Body Container -->
             <div class="relative flex-1 bg-[#FAF7F8] flex items-center justify-center p-4 min-h-[480px]">
                 
-                <!-- View 1: Image Lightbox -->
-                <div id="lightbox-image-view" class="w-full h-full flex items-center justify-center">
-                    <img id="lightbox-img-el" src="" alt="Detail Tas" class="max-h-[70vh] max-w-full object-contain filter drop-shadow-md transition-all">
+                <!-- View 1: Image Lightbox with Slider Prev/Next Controls -->
+                <div id="lightbox-image-view" class="w-full h-full flex items-center justify-center relative">
+                    <!-- Tombol Navigasi Sebelumnya (Prev) -->
+                    <button type="button" id="lb-btn-prev" onclick="lightboxPrevImage()" class="absolute left-2 sm:left-4 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-rosepet-fresh text-rosepet-dark hover:text-white shadow-lg border border-rosepet-soft/80 flex items-center justify-center text-lg font-bold transition-all focus:outline-none" title="Foto Sebelumnya">
+                        ‹
+                    </button>
+
+                    <img id="lightbox-img-el" src="" alt="Detail Tas" class="max-h-[70vh] max-w-full object-contain filter drop-shadow-md transition-all duration-200">
+
+                    <!-- Tombol Navigasi Berikutnya (Next) -->
+                    <button type="button" id="lb-btn-next" onclick="lightboxNextImage()" class="absolute right-2 sm:right-4 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-rosepet-fresh text-rosepet-dark hover:text-white shadow-lg border border-rosepet-soft/80 flex items-center justify-center text-lg font-bold transition-all focus:outline-none" title="Foto Berikutnya">
+                        ›
+                    </button>
+
+                    <!-- Indikator Halaman Foto & Reset -->
+                    <div class="absolute bottom-2 inset-x-0 flex items-center justify-center gap-2 pointer-events-none">
+                        <div class="pointer-events-auto px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-rosepet-soft shadow-sm flex items-center gap-2 text-xs font-bold text-rosepet-dark">
+                            <span id="lb-counter">1 / 1</span>
+                            <span class="text-rosepet-muted">•</span>
+                            <button type="button" onclick="lightboxResetToFirst()" class="text-rosepet-fresh hover:underline text-[11px]" title="Kembali ke Foto Pertama">
+                                ↺ Foto Awal
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- View 2: 3D Model Lightbox (Interactive Canvas) -->
@@ -496,14 +517,78 @@
         }
 
         // ==========================================
-        // LIGHTBOX CONTROLS
+        // LIGHTBOX CONTROLS WITH SLIDER
         // ==========================================
+        @php
+            $galleryUrls = [];
+            foreach($product->images as $imgItem) {
+                $galleryUrls[] = asset($imgItem->image_path);
+            }
+            if(empty($galleryUrls)) {
+                $galleryUrls[] = $firstImg;
+            }
+        @endphp
+        const productGalleryPhotos = @json($galleryUrls);
+        let currentLbPhotoIndex = 0;
+
+        function updateLightboxImageDisplay() {
+            const imgEl = document.getElementById('lightbox-img-el');
+            const counterEl = document.getElementById('lb-counter');
+            const total = productGalleryPhotos.length;
+
+            if (total === 0) return;
+
+            if (currentLbPhotoIndex < 0) currentLbPhotoIndex = total - 1;
+            if (currentLbPhotoIndex >= total) currentLbPhotoIndex = 0;
+
+            imgEl.style.opacity = '0.3';
+            setTimeout(() => {
+                imgEl.src = productGalleryPhotos[currentLbPhotoIndex];
+                imgEl.style.opacity = '1';
+            }, 100);
+
+            if (counterEl) {
+                counterEl.innerText = `${currentLbPhotoIndex + 1} / ${total}`;
+            }
+
+            const btnPrev = document.getElementById('lb-btn-prev');
+            const btnNext = document.getElementById('lb-btn-next');
+            if (btnPrev && btnNext) {
+                if (total <= 1) {
+                    btnPrev.classList.add('hidden');
+                    btnNext.classList.add('hidden');
+                } else {
+                    btnPrev.classList.remove('hidden');
+                    btnNext.classList.remove('hidden');
+                }
+            }
+        }
+
+        function lightboxNextImage() {
+            currentLbPhotoIndex++;
+            updateLightboxImageDisplay();
+        }
+
+        function lightboxPrevImage() {
+            currentLbPhotoIndex--;
+            updateLightboxImageDisplay();
+        }
+
+        function lightboxResetToFirst() {
+            currentLbPhotoIndex = 0;
+            updateLightboxImageDisplay();
+        }
+
         function openImageLightbox(imgUrl, title) {
             document.getElementById('lightbox-title').innerText = title;
-            document.getElementById('lightbox-subtitle').innerText = 'Foto Resolusi Penuh WebP';
+            document.getElementById('lightbox-subtitle').innerText = 'Foto Resolusi Penuh WebP (Geser / Klik Panah)';
             document.getElementById('lightbox-image-view').classList.remove('hidden');
             document.getElementById('lightbox-3d-view').classList.add('hidden');
-            document.getElementById('lightbox-img-el').src = imgUrl;
+
+            // Cari index foto yang diklik di array galeri
+            const matchedIndex = productGalleryPhotos.findIndex(url => url === imgUrl);
+            currentLbPhotoIndex = matchedIndex !== -1 ? matchedIndex : 0;
+            updateLightboxImageDisplay();
 
             document.getElementById('universal-lightbox').classList.remove('hidden');
         }
@@ -527,6 +612,20 @@
         function closeLightbox() {
             document.getElementById('universal-lightbox').classList.add('hidden');
         }
+
+        // Navigasi keyboard panah kiri/kanan & tombol escape untuk lightbox
+        document.addEventListener('keydown', function(e) {
+            const lb = document.getElementById('universal-lightbox');
+            if (lb && !lb.classList.contains('hidden')) {
+                if (e.key === 'ArrowRight') {
+                    lightboxNextImage();
+                } else if (e.key === 'ArrowLeft') {
+                    lightboxPrevImage();
+                } else if (e.key === 'Escape') {
+                    closeLightbox();
+                }
+            }
+        });
 
         // ==========================================
         // STOREFRONT 3D VIEWPORT

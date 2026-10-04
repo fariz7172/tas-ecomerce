@@ -163,7 +163,10 @@
             </div>
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-rosepet-muted mb-1.5">Kode Hex Warna</label>
-                <input type="text" name="variant_color_hex" required value="#F8C8D4" class="w-full bg-[#FFF9FA] rounded-xl px-4 py-2.5 text-xs text-rosepet-dark border border-rosepet-soft focus:border-rosepet-fresh outline-none">
+                <div class="flex items-center gap-2">
+                    <input type="color" value="#F8C8D4" onchange="document.getElementById('create-color-hex-input').value = this.value" class="w-10 h-10 rounded-xl cursor-pointer border border-rosepet-soft p-1 bg-white flex-shrink-0">
+                    <input type="text" id="create-color-hex-input" name="variant_color_hex" required value="#F8C8D4" class="w-full bg-[#FFF9FA] rounded-xl px-4 py-2.5 text-xs text-rosepet-dark border border-rosepet-soft focus:border-rosepet-fresh outline-none font-mono font-bold">
+                </div>
             </div>
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-rosepet-muted mb-1.5">Stok Awal Gudang</label>
