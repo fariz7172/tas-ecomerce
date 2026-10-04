@@ -8,6 +8,18 @@
     <meta name="description" content="{{ Str::limit(strip_tags($product->description), 150) }}">
     <link rel="canonical" href="{{ route('product.detail', $product->slug) }}">
 
+    <!-- Open Graph Meta Tags (Untuk Preview Kartu Facebook, WhatsApp & Twitter) -->
+    @php
+        $ogImg = $product->images->first()?->image_path ? asset($product->images->first()->image_path) : asset('assets/logo.png');
+        $minPrice = $product->variants->min('promo_price') ?: $product->variants->min('price');
+    @endphp
+    <meta property="og:type" content="product">
+    <meta property="og:title" content="{{ $product->name }} - Mikael On Shop">
+    <meta property="og:description" content="{{ $product->material }} • {{ $product->dimensions_cm }} • Mulai Rp {{ number_format($minPrice ?? 0, 0, ',', '.') }}. 100% Original Leather & COD Se-Indonesia.">
+    <meta property="og:image" content="{{ $ogImg }}">
+    <meta property="og:url" content="{{ route('product.detail', $product->slug) }}">
+    <meta property="og:site_name" content="Mikael On Shop">
+
     <!-- Google Fonts & Tailwind CDN -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
