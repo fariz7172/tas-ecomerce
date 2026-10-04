@@ -375,6 +375,29 @@ class AdminCatalogController extends Controller
         return redirect()->route('admin.products.index')->with('success', "Tas {$name} dan seluruh asetnya berhasil dihapus!");
     }
 
+    /**
+     * Auto-Post Produk Tas ke Facebook Page via Meta Graph API
+     */
+    public function postToFacebook(Request $request, $id, \App\Services\FacebookPageService $fbService)
+    {
+        $realId = SecureIdService::decrypt($id) ?? (is_numeric($id) ? (int)$id : null);
+        if (!$realId) abort(404, 'Token produk tidak valid.');
+
+        $product = Product::with(['images', 'variants'])->findOrFail($realId);
+
+        if (!$fbService->isConfigured()) {
+            return redirect()->back()->with('error', 'Konfigurasi Facebook Page belum lengkap di .env (FACEBOOK_PAGE_ID & FACEBOOK_PAGE_ACCESS_TOKEN dibutuhkan).');
+        }
+
+        $result = $fbService->publishProduct($product, $request->input('custom_caption'));
+
+        if ($result['success']) {
+            return redirect()->back()->with('success', "Berhasil! Produk {$product->name} telah diposting ke Facebook Page resmi toko.");
+        }
+
+        return redirect()->back()->with('error', $result['error'] ?? 'Gagal memposting ke Facebook Page.');
+    }
+
     // ==========================================
     // 2b. PRODUCT IMAGE DESTROY / SET PRIMARY
     // ==========================================
