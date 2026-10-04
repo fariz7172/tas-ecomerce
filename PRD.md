@@ -48,11 +48,14 @@
 | **FEAT-02** | 3D Interactive Hero & Multi-Media Card Slider Three.js | P0 (MVP) | Completed | [`docs/features/product-and-variants.md`](docs/features/product-and-variants.md) |
 | **FEAT-03** | Server-Ready 3D GLB Compression (Draco & WebP) | P0 (MVP) | Completed | [`docs/features/product-and-variants.md`](docs/features/product-and-variants.md) |
 | **FEAT-04** | Storefront Detail Page & Universal Media Lightbox (Photo + 3D) | P0 (MVP) | Completed | [`docs/features/product-and-variants.md`](docs/features/product-and-variants.md) |
-| **FEAT-05** | Single-Page Direct Checkout (Guest & Registered + COD / VA / QRIS) | P0 (MVP) | Planned | [`docs/features/single-page-checkout.md`](docs/features/single-page-checkout.md) |
-| **FEAT-06** | Perhitungan Ongkir & Integrasi Kurir (JNE, SiCepat, COD) | P0 (MVP) | Planned | `docs/features/shipping-logistics-api.md` |
-| **FEAT-07** | Payment Gateway Instan & Webhook Listener (Midtrans / Xendit) | P1 (v1) | Planned | `docs/features/payment-gateway-instant.md` |
-| **FEAT-08** | Notifikasi Konfirmasi & Follow-up WhatsApp Otomatis (Fonnte / Wablas) | P1 (v1) | Planned | `docs/features/whatsapp-notifications.md` |
-| **FEAT-09** | Admin Order Fulfillment & Cetak Thermal Shipping Label (10x15cm) | P1 (v1) | Planned | `docs/features/admin-order-fulfillment.md` |
+| **FEAT-05** | Single-Page Direct Checkout (Guest & Registered + COD / VA / QRIS) | P0 (MVP) | Completed | [`docs/features/single-page-checkout.md`](docs/features/single-page-checkout.md) |
+| **FEAT-06** | Perhitungan Ongkir & Integrasi Kurir (JNE, SiCepat, COD Bebas Ongkir) | P0 (MVP) | Completed | `docs/features/shipping-logistics-api.md` |
+| **FEAT-07** | Payment Gateway Instan Midtrans Snap & Webhook Listener (QRIS / VA) | P1 (v1) | Completed | `docs/features/payment-gateway-instant.md` |
+| **FEAT-08** | Notifikasi & Direct Order WhatsApp CS Resmi (1-Klik wa.me Template) | P1 (v1) | Completed | `docs/features/whatsapp-notifications.md` |
+| **FEAT-09** | Admin Order Fulfillment, Pencarian Multi-Kolom & Cetak Label Thermal 10x15cm | P1 (v1) | Completed | `docs/features/admin-order-fulfillment.md` |
+| **FEAT-10** | Cetak Invoice Resmi Toko Standar A4 / PDF Tax Invoice | P1 (v1) | Completed | `docs/features/admin-order-fulfillment.md` |
+| **FEAT-11** | Manajemen Galeri Foto (Hapus Fisik WebP & Jadikan Foto Utama) | P1 (v1) | Completed | [`docs/features/product-and-variants.md`](docs/features/product-and-variants.md) |
+| **FEAT-12** | Integrasi Auto-Post Facebook Page Resmi Toko via Meta Graph API v20.0 | P1 (v1) | Completed | `docs/features/social-commerce.md` |
 
 ---
 
