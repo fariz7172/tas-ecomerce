@@ -179,18 +179,16 @@
 
                                         $fbShareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' . urlencode($prodUrl) . '&quote=' . urlencode($copyCaption);
                                     @endphp
-                                    <div class="flex items-center gap-1" x-data="{ copied: false, modalOpen: false }">
-                                        <!-- Tombol Share FB Cerdas (Otomatis Salin Teks + Buka Facebook) -->
-                                        <button type="button" @click="navigator.clipboard.writeText(`{{ addslashes($copyCaption) }}`); copied = true; window.open('{{ $fbShareUrl }}', '_blank', 'width=626,height=520'); setTimeout(() => copied = false, 3000)" class="px-2.5 py-1.5 rounded-lg bg-[#1877F2] hover:bg-[#166FE5] text-white font-bold text-[11px] transition-all flex items-center gap-1.5 shadow-sm" title="Klik untuk Otomatis Salin Teks Lengkap & Buka Facebook (Tinggal Paste Ctrl+V di FB)">
+                                    <div class="flex items-center gap-1">
+                                        <!-- Tombol Share FB Asli (Membuka Dialog Facebook Resmi Tanpa Ketergantungan Script) -->
+                                        <a href="{{ $fbShareUrl }}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-[#1877F2] hover:bg-[#166FE5] text-white font-bold text-[11px] transition-all flex items-center gap-1.5 shadow-sm" title="Bagikan ke Facebook">
                                             <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                                            <span x-show="!copied">Share FB</span>
-                                            <span x-show="copied" style="display:none;" class="text-amber-200">Disalin! Paste di FB</span>
-                                        </button>
+                                            <span>Share FB</span>
+                                        </a>
 
-                                        <!-- Tombol Cepat Salin Caption Lengkap -->
-                                        <button type="button" @click="navigator.clipboard.writeText(`{{ addslashes($copyCaption) }}`); copied = true; setTimeout(() => copied = false, 2000)" class="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all border border-gray-200" title="Salin Teks Lengkap (Nama, Merk, Harga, Stok, Warna) untuk di-Paste di FB">
-                                            <span x-show="!copied" class="text-xs">📋</span>
-                                            <span x-show="copied" class="text-[10px] text-emerald-600 font-bold" style="display:none;">✓</span>
+                                        <!-- Tombol Salin Data Produk Lengkap -->
+                                        <button type="button" onclick="copyProductCaption(this, `{{ addslashes($copyCaption) }}`)" class="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all border border-gray-200" title="Salin Rincian Produk (Nama, Merk, Harga, Stok, Warna) untuk di-Paste di FB">
+                                            <span class="btn-copy-icon text-xs">📋</span>
                                         </button>
                                     </div>
 
@@ -239,4 +237,38 @@
         @endif
     </div>
 </div>
+
+<script>
+    function copyProductCaption(buttonEl, text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => showCopiedToast(buttonEl));
+        } else {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showCopiedToast(buttonEl);
+            } catch (err) {
+                console.error('Fallback copy error:', err);
+            }
+            document.body.removeChild(textArea);
+        }
+    }
+
+    function showCopiedToast(btn) {
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = '<span class="text-[10px] text-emerald-600 font-bold">✓ Disalin</span>';
+        btn.classList.add('bg-emerald-50', 'border-emerald-200');
+        setTimeout(() => {
+            btn.innerHTML = originalContent;
+            btn.classList.remove('bg-emerald-50', 'border-emerald-200');
+        }, 2000);
+    }
+</script>
 @endsection

@@ -24,9 +24,11 @@
     <meta name="twitter:description" content="Eksplorasi siluet tas kulit mewah dalam kanvas 3D interaktif Three.js.">
 
     <!-- Google Structured Data: JSON-LD Rich Snippet -->
+    @if(isset($jsonLd))
     <script type="application/ld+json">
         {!! json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
+    @endif
 
     <!-- Cloudflare & Browser Early Preloading -->
     <link rel="preload" href="/models/lv.glb" as="fetch" crossorigin>
