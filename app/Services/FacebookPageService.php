@@ -53,26 +53,36 @@ class FacebookPageService
         $minPrice = $product->variants->min('promo_price') ?: $product->variants->min('price');
         $formattedPrice = $minPrice ? 'Rp ' . number_format($minPrice, 0, ',', '.') : 'Hubungi Admin';
 
-        $brandName = $product->brand ? $product->brand->name : 'Maison Svala';
+        $brandName = $product->brand ? $product->brand->name : 'Mikael On Shop';
         $categoryName = $product->category ? $product->category->name : 'Luxury Bag';
 
-        // Susun daftar varian warna & stok
+        // Susun daftar varian warna & harga promo/normal
         $variantList = $product->variants->map(function ($v) {
-            $priceText = $v->promo_price ? 'Rp ' . number_format($v->promo_price, 0, ',', '.') : 'Rp ' . number_format($v->price, 0, ',', '.');
-            return "  • Warna {$v->color_name}: {$priceText} (Stok: {$v->stock})";
+            $priceText = $v->promo_price 
+                ? 'Rp ' . number_format($v->promo_price, 0, ',', '.') . ' (Normal: Rp ' . number_format($v->price, 0, ',', '.') . ')'
+                : 'Rp ' . number_format($v->price, 0, ',', '.');
+            return "  • Varian {$v->color_name}: {$priceText} | Stok: {$v->stock} pcs";
         })->implode("\n");
 
-        // Susun teks caption menarik untuk Facebook
-        $message = $customMessage ?: "👜 KOLEKSI TERBARU: {$product->name}\n"
-            . "🏷️ Brand: {$brandName} | Kategori: {$categoryName}\n\n"
-            . "✨ Material: {$product->material}\n"
-            . "📐 Dimensi: {$product->dimensions_cm}\n"
+        // WhatsApp CS Toko Resmi
+        $waAdminNumber = '6281288992211';
+        $waText = "Halo Mikael On Shop, saya tertarik memesan tas {$product->name} ({$productUrl})";
+        $waLink = "https://wa.me/{$waAdminNumber}?text=" . urlencode($waText);
+
+        // Susun teks caption lengkap dan profesional untuk Facebook Toko
+        $message = $customMessage ?: "✨ KOLEKSI TERBARU RESMI: {$product->name} ✨\n\n"
+            . "🏷️ Brand: {$brandName}\n"
+            . "📂 Kategori: {$categoryName}\n"
+            . "🧵 Bahan/Material: {$product->material}\n"
+            . "📐 Dimensi/Ukuran: {$product->dimensions_cm}\n"
             . "💎 Harga Mulai: {$formattedPrice}\n\n"
-            . "🎨 Pilihan Warna & Stok:\n"
+            . "🎨 PILIHAN WARNA & STOK GUDANG:\n"
             . ($variantList ?: "  • Stok Ready Siap Kirim\n") . "\n"
-            . "🔒 Garansi 100% Original & Mendukung COD Se-Indonesia\n\n"
-            . "Lihat detail & pesan sekarang:\n{$productUrl}\n\n"
-            . "#MikaelOnShop #{$brandName} #LuxuryBag #TasWanita #OriginalLeather #FashionID";
+            . "🛡️ 100% Produk Original & Bergaransi\n"
+            . "🚚 Mendukung Bayar di Tempat (COD) Seluruh Indonesia\n\n"
+            . "🌐 Link Produk di Website:\n{$productUrl}\n\n"
+            . "📱 Pesan Cepat via WhatsApp Official:\n{$waLink}\n\n"
+            . "#MikaelOnShop #TasWanita #TasLuxury #OriginalBag #FashionIndonesia #JualTasOriginal #COD";
 
         // Cari file fisik foto utama produk di direktori storage lokal
         $localImagePath = null;
