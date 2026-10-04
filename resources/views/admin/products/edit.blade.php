@@ -146,11 +146,76 @@
         </div>
     </form>
 
+    <!-- Galeri Foto Produk & Opsi Hapus Foto -->
+    <div class="bg-white rounded-3xl p-8 border border-rosepet-soft shadow-sm space-y-6">
+        <div class="flex items-center justify-between border-b border-rosepet-soft pb-4">
+            <div>
+                <h2 class="font-serif text-lg font-bold text-rosepet-dark">2. Galeri Foto Produk (Bisa Hapus & Atur Foto Utama)</h2>
+                <p class="text-xs text-rosepet-muted">Kelola koleksi foto tampilan tas. Fariz bisa menghapus foto yang tidak diinginkan atau menetapkan foto utama produk.</p>
+            </div>
+            <span class="text-xs font-bold text-rosepet-fresh bg-rosepet-soft px-3 py-1 rounded-full">
+                {{ $product->images->count() }} Foto Tersedia
+            </span>
+        </div>
+
+        @if($product->images->isEmpty())
+        <div class="text-center py-8 bg-[#FFF9FA] rounded-2xl border border-dashed border-rosepet-soft text-rosepet-muted text-xs">
+            Belum ada foto galeri untuk tas ini. Silakan upload foto baru pada form Master Data di atas.
+        </div>
+        @else
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            @foreach($product->images as $img)
+            @php
+                $secureImgId = \App\Services\SecureIdService::encrypt($img->id);
+                $fullImgUrl = str_starts_with($img->image_path, 'http') ? $img->image_path : asset($img->image_path);
+            @endphp
+            <div class="relative group bg-[#FFF9FA] rounded-2xl border {{ $img->is_primary ? 'border-rosepet-fresh ring-2 ring-rosepet-fresh/30' : 'border-rosepet-soft' }} overflow-hidden p-3 flex flex-col justify-between transition-all hover:shadow-md">
+                
+                <!-- Badge Foto Utama -->
+                <div class="flex items-center justify-between gap-1 mb-2">
+                    @if($img->is_primary)
+                    <span class="px-2 py-0.5 rounded-full bg-rosepet-fresh text-white font-bold text-[9px] uppercase tracking-wider shadow-sm">
+                        ⭐ Foto Utama
+                    </span>
+                    @else
+                    <form action="{{ route('admin.products.images.primary', $secureImgId) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="text-[10px] text-rosepet-muted hover:text-rosepet-fresh font-bold hover:underline" title="Jadikan Foto Utama">
+                            Jadikan Utama
+                        </button>
+                    </form>
+                    @endif
+
+                    <!-- Tombol Hapus Foto -->
+                    <form action="{{ route('admin.products.images.destroy', $secureImgId) }}" method="POST" onsubmit="return confirm('Apakah Fariz yakin ingin menghapus foto tas ini?')" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="w-6 h-6 rounded-lg bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white flex items-center justify-center text-xs transition-colors border border-rose-200" title="Hapus Foto">
+                            🗑️
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Preview Gambar -->
+                <div class="w-full aspect-square rounded-xl bg-white border border-rosepet-soft overflow-hidden flex items-center justify-center p-2 mb-2">
+                    <img src="{{ $fullImgUrl }}" alt="{{ $img->alt_text }}" class="w-full h-full object-contain">
+                </div>
+
+                <!-- Info Path & Urutan -->
+                <div class="text-[10px] text-rosepet-muted truncate">
+                    <span class="font-mono">{{ basename($img->image_path) }}</span>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @endif
+    </div>
+
     <!-- Manajemen Varian Warna & Stok -->
     <div class="bg-white rounded-3xl p-8 border border-rosepet-soft shadow-sm space-y-6">
         <div class="flex items-center justify-between border-b border-rosepet-soft pb-4">
             <div>
-                <h2 class="font-serif text-lg font-bold text-rosepet-dark">2. Kelola Varian Warna & Stok Gudang</h2>
+                <h2 class="font-serif text-lg font-bold text-rosepet-dark">3. Kelola Varian Warna & Stok Gudang</h2>
                 <p class="text-xs text-rosepet-muted">Setiap tas bisa memiliki banyak pilihan warna dengan SKU, harga promo, dan stok tersendiri.</p>
             </div>
         </div>

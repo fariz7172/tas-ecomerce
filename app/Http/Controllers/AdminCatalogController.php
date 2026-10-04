@@ -376,6 +376,49 @@ class AdminCatalogController extends Controller
     }
 
     // ==========================================
+    // 2b. PRODUCT IMAGE DESTROY / SET PRIMARY
+    // ==========================================
+    public function productImageDestroy($id)
+    {
+        $realId = SecureIdService::decrypt($id) ?? (is_numeric($id) ? (int)$id : null);
+        if (!$realId) abort(404, 'Token foto tidak valid.');
+
+        $image = ProductImage::findOrFail($realId);
+        $productId = $image->product_id;
+        $secureProductId = SecureIdService::encrypt($productId);
+
+        // Hapus file fisik dari storage jika ada
+        if (str_starts_with($image->image_path, 'storage/')) {
+            $relativePath = str_replace('storage/', '', $image->image_path);
+            Storage::disk('public')->delete($relativePath);
+        }
+
+        $image->delete();
+
+        // Jika foto yang dihapus adalah primary, jadikan foto pertama yang tersisa sebagai primary
+        $remaining = ProductImage::where('product_id', $productId)->first();
+        if ($remaining && !ProductImage::where('product_id', $productId)->where('is_primary', true)->exists()) {
+            $remaining->update(['is_primary' => true]);
+        }
+
+        return redirect()->route('admin.products.edit', $secureProductId)->with('success', 'Foto produk berhasil dihapus!');
+    }
+
+    public function productImageSetPrimary($id)
+    {
+        $realId = SecureIdService::decrypt($id) ?? (is_numeric($id) ? (int)$id : null);
+        if (!$realId) abort(404, 'Token foto tidak valid.');
+
+        $image = ProductImage::findOrFail($realId);
+        $secureProductId = SecureIdService::encrypt($image->product_id);
+
+        ProductImage::where('product_id', $image->product_id)->update(['is_primary' => false]);
+        $image->update(['is_primary' => true]);
+
+        return redirect()->route('admin.products.edit', $secureProductId)->with('success', 'Foto utama produk berhasil diperbarui!');
+    }
+
+    // ==========================================
     // 3. VARIANT STORE / DESTROY
     // ==========================================
     public function variantStore(Request $request, $productId)

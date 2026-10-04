@@ -78,6 +78,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/products/{id}/edit', [AdminCatalogController::class, 'productEdit'])->name('admin.products.edit');
     Route::put('/products/{id}', [AdminCatalogController::class, 'productUpdate'])->name('admin.products.update');
     Route::delete('/products/{id}', [AdminCatalogController::class, 'productDestroy'])->name('admin.products.destroy');
+    Route::delete('/products/images/{id}', [AdminCatalogController::class, 'productImageDestroy'])->name('admin.products.images.destroy');
+    Route::post('/products/images/{id}/primary', [AdminCatalogController::class, 'productImageSetPrimary'])->name('admin.products.images.primary');
 
     // Variant Operations
     Route::post('/products/{id}/variants', [AdminCatalogController::class, 'variantStore'])->name('admin.variants.store');
